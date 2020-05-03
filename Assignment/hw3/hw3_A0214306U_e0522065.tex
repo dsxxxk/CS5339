@@ -1,0 +1,324 @@
+\documentclass{article}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{amsmath}
+\usepackage{bbm}
+\usepackage{dsfont}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}  % Use Input in the format of Algorithm
+\renewcommand{\algorithmicensure}{\textbf{Output:}} % Use Output in the format of Algorithm
+\definecolor{keywordcolor}{rgb}{0.8,0.1,0.5}
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{ %
+backgroundcolor=\color{white},      % choose the background color
+basicstyle=\footnotesize\ttfamily,  % size of fonts used for the code
+columns=fullflexible,
+tabsize=4,
+breaklines=true,               % automatic line breaking only at whitespace
+captionpos=b,                  % sets the caption-position to bottom
+commentstyle=\color{mygreen},  % comment style
+escapeinside={\%*}{*)},        % if you want to add LaTeX within your code
+keywordstyle=\color{blue},     % keyword style
+stringstyle=\color{mymauve}\ttfamily,  % string literal style
+frame=single,
+rulesepcolor=\color{red!20!green!20!blue!20},
+% identifierstyle=\color{red},
+language=c++,
+}
+\lstset{breaklines}
+\lstset{extendedchars=false}
+
+\author{Bao Jinge A0214306U e0522065@u.nus.edu}
+\title{Solutions for Homework 3}
+\date{}
+
+\begin{document}
+	\maketitle
+	\section{Perceptron Algorithm as Online Convex Optimization}
+
+	\subsection{a}
+	Since online gradient descent algorithm has equations as follows
+	\begin{equation}
+	w^{(t+1)} = w^{(t)}-\eta\nabla_{w^{(t)}}l(w^{(t)},x_t,y_t)
+	\label{eq1}
+	\end{equation}
+	When the predication is correct,
+	\begin{equation}
+	\nabla_{w^{(t)}}l(w^{(t)},x_t,y_t)=\nabla_{w^{(t)}}0=0
+	\label{eq2}
+	\end{equation}
+	When the predication is incorrect,
+	\begin{equation}
+	\nabla_{w^{(t)}}l(w^{(t)},x_t,y_t)=\nabla_{w^{(t)}}max\{0,1-y_t\left<w^{(t)},x_t\right>\}=-y_tx_t
+	\label{eq3}
+	\end{equation}
+	Plug Equation \ref{eq2} and \ref{eq3} into Equation \ref{eq1} correspondingly, we find that
+	\label{eq0}
+	\begin{equation}
+	w^{(t+1)}=
+	\begin{cases}
+	w^{(t)} &\text{predication is correct}\\
+	w^{(t)}+\eta y_xx_t &\text{prediction is incorrect}\\
+	\end{cases}
+	\label{eq4}
+	\end{equation}
+	As we can see, with such loss function mentioned in problem, the perception algorithm in only doing online gradient descent when prediciton is correct.
+
+	\subsection{b}
+	The total loss of this algorithm is the expression as follows
+	\begin{equation}
+	\sum_{t=1}^{T}l(w^{(t)},x_t,t_t)
+	\label{eq5}
+	\end{equation}
+	where $T$ is the total rounds.
+	Let $X_t$ is a indicator, which is equal to $0$ when prediction is correct and $1$ when prediction is incorrect in $t$ round. Thus, the total number of mistakes is
+	\begin{equation}
+	\sum_{t=1}^{T}X_t
+	\label{eq6}
+	\end{equation}
+	When prediction is correct,
+	\begin{equation}
+	l(w^{(t)},x_t,t_t) = 0 \geq 0 =X_t
+	\label{eq7}
+	\end{equation}
+	When prediction is incorrect, $y_t\left<w^{(t)},x_t\right><0$, thus
+	\begin{equation}
+	l(w^{(t)},x_t,t_t) = max\{0,1-y_t\left<w^{(t)},x_t\right>\}=1-y_t\left<w^{(t)},x_t\right> \geq 1 \geq X_t
+	\label{eq8}
+	\end{equation}
+	Plug Equation \ref{eq6}, \ref{eq7} and \ref{eq8} into Equation \ref{eq5}, we get such bound
+	\begin{equation}
+	\sum_{t=1}^{T}l(w^{(t)},x_t,t_t) \geq \sum_{t=1}^{T}X_t
+	\label{eq9}
+	\end{equation}
+	which means the total loss upper bounds the total number of mistakes.
+
+	\subsection{c}
+	Because there exists $w^*$ such that $y_t\left<w^*,x_t\right>$, with definition, the prediction is always right. Therefore, from Equation \ref{eq4}, the weight will always not be updated. From definition of defintion of problem (a), $w^*$ will have zero total loss, i.e.
+	\begin{equation}
+	\sum_{t=1}^{T}l(w^*,x_t,t_t)=0
+	\label{eq10}
+	\end{equation}
+
+	\subsection{d}
+	According to SSBD Lemma 14.1, let $v_t = \nabla_{w^{(t)}}l(w^{(t)},x_t,y_t)$, we get
+	\begin{equation}
+	\sum_{t=1}^{T}\left<w^{(t)}-w^*,\nabla_{w^{(t)}}l(w^{(t)},x_t,y_t)\right> \leq \frac{||w^*||^2}{2\eta}+\frac{\eta}{2}\sum_{t=1}^{T}|| \nabla_{w^{(t)}}l(w^{(t)},x_t,y_t)||^2
+	\label{eq11}
+	\end{equation}
+	From Equation \ref{eq2} and \ref{eq3}, we know that when prediction is incorrect,
+	\begin{equation}
+	\nabla_{w^{(t)}}l(w^{(t)},x_t,y_t)||^2=||x_ty_t||^2 =||x_t||^2\leq R^2
+	\label{eq12}
+	\end{equation}
+	When prediction is correct,
+	\begin{equation}
+	\nabla_{w^{(t)}}l(w^{(t)},x_t,y_t)||^2=||0||^2=0
+	\label{eq13}
+	\end{equation}
+	From what is given by part (d), there are M mistakes. Thus,
+	\begin{equation}
+	\sum_{t=1}^{T}\left<w^{(t)}-w^*,\nabla_{w^{(t)}}l(w^{(t)},x_t,y_t)\right> \leq \frac{||w^*||^2}{2\eta}+\frac{\eta}{2}MR^2
+	\label{eq14}
+	\end{equation}
+	For lhs of Equation \ref{eq14}, we use property of convexity function, i.e.
+	\begin{equation}
+	l(w^{(t)},x_t,y_t)-l(w^*,x_t,y_t) \leq l\left<w^{(t)}-w^*,\nabla_{w^{(t)}}l(w^{(t)},x_t,y_)\right>
+	\label{eq15}
+	\end{equation}
+	Plug Equation \ref{eq15} into \ref{eq14}, we get
+	\begin{equation}
+	\sum_{t=1}^{T}(l(w^{(t)},x_t,y_t)-l(w^*,x_t,y_t)) \leq \frac{||w^*||^2}{2\eta}+\frac{\eta}{2}MR^2
+	\label{eq16}
+	\end{equation}
+	Because of result from part (c), i.e. Equation \ref{eq10}, we have
+	\begin{equation}
+	\sum_{t=1}^{T}l(w^{(t)},x_t,y_t) \leq \frac{||w^*||^2}{2\eta}+\frac{\eta}{2}MR^2
+	\label{eq17}
+	\end{equation}
+	Because of result from part (b), i.e.
+	\begin{equation}
+	\sum_{t=1}^{T}l(w^{(t)},x_t,y_t) \geq M
+	\label{eq18}
+	\end{equation}
+	Plug Equation \ref{eq18} into Equation \ref{eq17}, we habe
+	\begin{equation}
+	M \leq \frac{||w^*||^2}{2\eta}+\frac{\eta}{2}MR^2
+	\label{eq19}
+	\end{equation}
+
+	Here we set $\eta = \frac{||w^*||}{R\sqrt{M}}$, we get
+	\begin{equation}
+	M \leq ||w^*||^2R\sqrt{M}
+	\label{eq20}
+	\end{equation}
+	, i.e.
+	\begin{equation}
+	M \leq ||w^*||^2R^2
+	\label{eq21}
+	\end{equation}
+
+	\subsection{e}
+	For each round $t$,
+	\begin{equation}
+	\begin{aligned}
+	sign(\left<w^{(t)},x_i\right>)&=sign(\left<\sum_{i=1}^{t-1}\eta y_ix_i,x_t\right>)\\
+	&=sign(\left<\eta\sum_{i=1}^{t-1}y_ix_i,x_t\right>)\\
+	&=sign(\eta\left<\sum_{i=1}^{t-1}y_ix_i,x_t\right>)\\
+	&=sign(\eta)*sign(\left<\sum_{i=1}^{t-1}y_ix_i,x_t\right>)\\
+	\end{aligned}
+	\label{eq22}
+	\end{equation}
+	As what we can see as above, as long as $\eta>0$, then the predication will not be affected, because $sign(\eta)$ will always be $1$. Therefore, the mistake bound still holds when $\eta$ set to $1$.
+
+
+	\section{Switching Predictors}
+
+	\subsection{a}
+	Suppose there will be $M$ mistakes during $T$ rounds. As what is given by the problem, we predict using the label which agrees with the weighted majority of surviving hyphotheses. In other way, when mistake happens, there must be greater than half of weights of surviving hypotheses whose hypotheses did wrong prediction. Formall, suppose after $t$ round, there will be $h \in H_{t}$ remaining and initializing $H_{0}=H$. From analysis above, when prediction is incorrect
+	\begin{equation}
+	\sum_{h \in H_{t+1}}w_h \leq \frac{1}{2}\sum_{h\in H_t}w_h
+	\label{eq31}
+	\end{equation}
+	When predication is right,
+	\begin{equation}
+	\sum_{h \in H_{t+1}}w_h = \sum_{h\in H_t}w_h
+	\label{eq32}
+	\end{equation}
+	Therefore,
+	\begin{equation}
+	\sum_{h \in H_{T}}w_h \leq (\frac{1}{2})^M\sum_{h \in H_{0}}w_h=(\frac{1}{2})^M
+	\label{eq33}
+	\end{equation}
+	Since $h*$ is a predictor that does not make any error, $h* \in H_{T}$. Plug it into Equation \ref{eq33},
+	\begin{equation}
+	w_{h^*} \leq \sum_{h \in H_{T}}w_h \leq (\frac{1}{2})^M
+	\label{eq34}
+	\end{equation}
+	i.e.
+	\begin{equation}
+	M \leq \log\frac{1}{w_{h^*}}
+	\label{eq35}
+	\end{equation}
+
+	\subsection{b}
+	
+	\subsubsection{i}
+	When $T=1$, the k-switching predictor will have just one hypothesis, i.e. $k=0$.
+	When $k=0$, as what is given by definition, the weight for each $0$-switching predictor is 
+	\begin{equation}
+	\frac{1}{|H|(1-|H|)^0}p^0(1-p)^{1-0-1}=\frac{1}{|H|}
+	\label{eq36}
+	\end{equation}
+	Obviously, there will be $|H|$ such 0-switching predictor. Therefore, the sum of the weights of all such 0-switching predictors is 1.
+
+	\subsubsection{ii}
+	Denote the predictor sequence of length $t$ as $s_t$, the number of switches in $s_t$ as $k(s_t)$, the set of all $s_t$ as $S_t$ and the weight of each predictor sequence is $w(s_t)$.
+	As an inductive basis from (i), we know that when predictor sequences of lenght $t=T-1$, we have
+	\begin{equation}
+	\sum_{s_{T-1} \in S_{T-1}}\frac{1}{|H|(|H|-1)^{k(s_{T-1})}}p^{k(s_{T-1})}(1-p)^{T-2-k(s_{T-1})}=1
+	\label{eq37}
+	\end{equation}
+	When $t=T$ we focus on the last hypthosis that will be pushed back to $s_{T-1}$. There will be two cases.
+	Suppose the last hypothesis in each predictor sequence of $s_{T-1}$ is $h_{T-1}$.
+	For the $T$-th sample, if we choose the hypothesis $h_{T-1}$ to append, then we have $k(s_T)=k(s_{T-1})$. Denote this event as $E_1$, the sum of weight that in such case is
+	\begin{equation}
+	\begin{aligned}
+	&\sum_{s_T \in S_T:E_1}\frac{1}{|H|(|H|-1)^{k(s_T)}}p^{k(s_T)}(1-p)^{T-1-k(s_T)}\\
+	=&\sum_{s_{T-1} \in S_{T-1}}\frac{1}{|H|(|H|-1)^{k(s_{T-1})}}p^{k(s_{T-1})}(1-p)^{T-1-k(s_{T-1})}\\
+	=&\sum_{s_{T-1} \in S_{T-1}}\frac{1}{|H|(|H|-1)^{k(s_{T-1})}}p^{k(s_{T-1})}(1-p)^{T-2-k(s_{T-1})}*(1-p)\\
+	=& 1-p
+	\end{aligned}
+	\label{eq38}
+	\end{equation}
+	if we choose to append a hypothesis which is not $h_{T-1}$, then we have $k_{s_T}=k_{s_{T-1}}+1$ and there will be $|H|-1$ choices from $H$. Denote this event as $E_2$, the sum of weight that in such case is
+	\begin{equation}
+	\begin{aligned}
+	&\sum_{s_T \in S_T:E_2}\frac{1}{|H|(|H|-1)^{k(s_T)}}p^{k(s_T)}(1-p)^{T-1-k(s_T)}\\
+	=&\sum_{s_{T-1} \in S_{T-1}}\frac{1}{|H|(|H|-1)^{k(s_{T-1})+1}}p^{k(s_{T-1})+1}(1-p)^{T-1-(k(s_{T-1})+1)}*(|H|-1)\\
+	=&\sum_{s_{T-1} \in S_{T-1}}\frac{1}{|H|(|H|-1)^{k(s_{T-1})}}p^{k(s_{T-1})}(1-p)^{T-2-k(s_{T-1})}*p\\
+	=& p
+	\end{aligned}
+	\label{eq39}
+	\end{equation}
+	Since $E1$ and $E2$ are involed all cases that will happen, thus
+	\begin{equation}
+	\begin{aligned}
+	&\sum_{s_T \in S_T}\frac{1}{|H|(|H|-1)^{k(s_T)}}p^{k(s_T)}(1-p)^{T-1-k(s_T)}\\
+	=&\sum_{s_T \in S_T:E1}\frac{1}{|H|(|H|-1)^{k(s_T)}}p^{k(s_T)}(1-p)^{T-1-k(s_T)} +\sum_{s_T \in S_T:E@}\frac{1}{|H|(|H|-1)^{k(s_T)}}p^{k(s_T)}(1-p)^{T-1-k(s_T)}\\
+	=& (1-p)+ p\\
+	=& 1
+	\end{aligned}
+	\label{eq40}
+	\end{equation}
+	Thus the statement is true for predictor sequence of length $T$.
+
+	\subsection{c}
+	From problem (b), we know that each $k$-switching predictor has weight
+	\begin{equation}
+	\frac{1}{|H|(|H|-1)^{k}}p^{k}(1-p)^{T-1-k}
+	\label{eq41}
+	\end{equation}
+	Plug equation above into Equation \ref{eq35}, that give us
+	\begin{equation}
+	M \leq \log\frac{1}{w_{h^*}} = \log|H|+k\log(|H|-1)+k\log(1/p)+(T-k-1)\log(1/(1-p))
+	\label{eq42}
+	\end{equation}
+
+	\subsection{d}
+	Focus on the inductive proof in part (b). What we focus on is the last hypothesis of the sequence. Suppose now the last hypothesis is $h^*$ and we need to predict for $x_t$ and $y_t$. We consider sum of the weights of all sequence ending with $h^*$ as $w_{h^*}$. If the prediction is wrong, then we can not use this sequence any more. Thus we set the weight of $w_{h^*}=0$. If the prediction is right, then we can keep use $h^*$, which means append $h^*$ to sequence that ends with $h^*$ and sequence that does not end with $h^*$. From inducation from part (b), we know the weight updated rule for the former is $w^{(t)}_{h^*}=w^{(t-1)}_{h^*}*(1-p)$. the wight updeted rule for the latter is $w^{(t)}_{h^*}=\sum_{h,h \neq h*}w_h^{(t-1)}*\frac{p}{|H|-1}$. As we can see, the update in each iteration is $O(|H|)$. The specified algorithm is as follows
+
+	\begin{algorithm}
+	\caption{K-swtiching Predicator Modified Halving Algorithm}
+	\label{alg:A}
+	\begin{algorithmic}[1]
+		\Require a finite class $H$ of expert binary predictors, $T$ predication sample of pair $(x_t,y_t)$
+		\Ensure k-switching predication
+		\ForAll{$h=1$ to $H$}
+		\State $w_h=\frac{1}{|H|}$
+		\EndFor
+		\ForAll{$t=1$ to $T$}
+			\State $\hat{y}=\arg\max_{r \in \{0,1\}}\sum_{h \in H, h(x_t)=r}w_h$
+			\State Output the prediction $\hat{y}$
+				\State $w\_sum=0$
+				\ForAll{$h=1$ to $H$}
+					\State $w\_sum=w\_sum+w_h$
+				\EndFor
+			\ForAll{$h=1$ to $H$}
+			\If{$h(x_t) \neq y_t$}
+				\State $w_h=0$
+			\Else
+				\State $w_h \leftarrow w_h * (1-p) + (w\_sum-w_h)* \frac{p}{|H|-1}$
+			\EndIf
+			\EndFor
+		\EndFor
+	\end{algorithmic}
+	\end{algorithm}
+	As we can see as above, the running time for each iteracion is $O(|H|)$
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

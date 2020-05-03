@@ -1,0 +1,79 @@
+\documentclass{article}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{graphicx} %插入图片的宏包
+\usepackage{float} %设置图片浮动位置的宏包
+\usepackage{subfigure} %插入多图时用子图显示的宏包
+\usepackage{cite}
+\definecolor{keywordcolor}{rgb}{0.8,0.1,0.5}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{ %
+backgroundcolor=\color{white},      % choose the background color
+basicstyle=\footnotesize\ttfamily,  % size of fonts used for the code
+columns=fullflexible,
+tabsize=4,
+breaklines=true,               % automatic line breaking only at whitespace
+captionpos=b,                  % sets the caption-position to bottom
+commentstyle=\color{mygreen},  % comment style
+escapeinside={\%*}{*)},        % if you want to add LaTeX within your code
+keywordstyle=\color{blue},     % keyword style
+stringstyle=\color{mymauve}\ttfamily,  % string literal style
+frame=single,
+rulesepcolor=\color{red!20!green!20!blue!20},
+% identifierstyle=\color{red},
+language=c++,
+}
+\lstset{breaklines}
+\lstset{extendedchars=false}
+
+\author{Bao Jinge(e0522065), Zhang Runtian (e0504862)}
+\title{Experiments and Analysis about Variational Dropout}
+\date{}
+
+\begin{document}
+	\maketitle
+	\section{Selected Papar}
+		"Variational Dropout Sparsifies Deep Neural Networks", Dmitry Molchanov, Arsenii Ashukha, and Dmitry Vetrov, ICML2017\cite{molchanov2017variational}.
+
+	\section{About the Paper}
+		As DNNs are prone to overfitting and also troubled by the computing cost, the paper as above used a modified regularization technique based on Variational Dropout named "Sparse Variational Dropout" that extends Variational Dropout to all possible values of dropout rates and leads to a sparse solution. Besides, the paper also propose a ways to greatly reduce the variance of the stochastic gradiant estimator and show that it leads to a much faster convergence and a better value of the objective function. In experiment, Sparse Variational Dropout leads to a high level of sparsity in full-connected and convolution layers of DNNs, especially on LeNet and VGG-like architectures. 
+
+	\section{Initial Reading}
+		We try to divide their work into three parts. \\
+
+		First, Variational Dropout theory review. They introduced necessary concepts about this technique, including Variational Inference, Reparameterization Trick, and relationship between Binary Dropout and Gaussian Dropout. Then they analyzed the original Variational Dropout. Both its advantages and difficulties.\\
+
+		Second, they introduced Sparse Variational Dropout and explained their work. They did additive Noise Reparameterization and successfully avoid the problem of large gradient variance by original Variational Dropout. They proposed an Approximation of KL Divergence and solved the former intractable term of KL divergence. As a result, they optimized the stochastic gradient variational lower bound, and proved that Sparse Varitional Dropout leads to sparsity in case of linear regression, and can be used to DNN with large parameters.\\
+	
+		Third, they performed experiments of Sparse Varitional Dropout on classification tasks using Lenet and VGG-like architectures, and produced Sparse Baysian DNNs. They found that it leads to extremely sparse solutions both in fully connected and convolutional layers. They compared it with Automatic Relevance Determination effect in empirical bayes, and found it has more advantages. The paper analyzed strange performance of this method under random label problem, but didn’t provide good explanation at last.\\
+	    
+	\section{Our Plan}
+		The sparsity of DNNs is very important to solve overfitting problem when using regularization method.\\
+		We are going to learn the paper in detail, review the theories, reading the incited papers\cite{frankle2018lottery} \cite{gale2019state} and truly understand both old and new Dropout technique. We will try to understand the effect of Sparse Variational Dropout mentioned in this paper from different views.\\
+		We will extend the experiment because the paper only applied the Sparse Variational Dropout to LeNets/VGG-like DNNs, and we plan to check its performance on more kinds of DNNs architectures, such as AlexNet, ResNet and so on. We will compare and analyze the results based on experiments mainly. The paper didn’t solve the problem of random label. We will try our best to explore this problem by tuning our Dropout parameters and give some own explanations based on this lecture. Finally, we will give some meaningful future directions.\\
+
+\bibliographystyle{plain}
+\bibliography{ref}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
